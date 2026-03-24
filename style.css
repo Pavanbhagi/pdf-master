@@ -254,3 +254,25 @@ body {
 .footer-links a:hover {
     text-decoration: underline;
 }
+/* Dark Mode Colors */
+body.dark-mode {
+    background-color: #121212;
+    color: #e8eaed;
+}
+
+body.dark-mode .navbar, 
+body.dark-mode .footer, 
+body.dark-mode .tool-card {
+    background-color: #1e1e1e;
+    border-color: #3c4043;
+    color: #e8eaed;
+}
+
+body.dark-mode .tool-card:hover {
+    background-color: #2d2e30;
+}
+
+body.dark-mode .hero p, 
+body.dark-mode .footer {
+    color: #bdc1c6;
+}

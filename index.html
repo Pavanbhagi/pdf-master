@@ -2,13 +2,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDF Master - All-in-One PDF Tools</title>
-    
-<meta name="google-site-verification" content="2uwQBTxSkF56QTB9iJokLnwUBWOkmBjDXb-QpAMe6BY" />
+
+    <meta name="google-site-verification" content="2uwQBTxSkF56QTB9iJokLnwUBWOkmBjDXb-QpAMe6BY" />
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#4285F4">
     <meta name="description" content="Free A to Z PDF tools. Merge PDFs and convert Images to PDF locally and safely.">
 </head>
+
 <body>
 
     <nav class="navbar">
@@ -18,6 +19,10 @@
             <li><a href="#">Compress</a></li>
             <li><a href="#">Convert</a></li>
             <li class="btn-login">Login</li>
+            <li><a href="#">Merge</a></li>
+            <li><a href="#">Convert</a></li>
+            <li id="dark-mode-toggle" style="cursor: pointer; font-size: 20px; list-style: none;">🌙</li>
+            <li class="btn-login">Login</li>
         </ul>
     </nav>
 
@@ -25,10 +30,14 @@
         <h1>Every tool you need to work with PDFs in one place</h1>
         <p>Every tool you need to use PDFs, at your fingertips. All are 100% FREE and easy to use!</p>
     </header>
-    <div class="safety-badge" style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; color: #1e8e3e; font-weight: 500;">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
-    Everything stays on your device. No files are uploaded to our servers.
-</div>
+    <div class="safety-badge"
+        style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; color: #1e8e3e; font-weight: 500;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path
+                d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
+        </svg>
+        Everything stays on your device. No files are uploaded to our servers.
+    </div>
 
     <main class="container">
         <div class="tools-grid">
@@ -50,7 +59,7 @@
                 <p>Make DOC and DOCX files easy to read by converting them to PDF.</p>
             </div>
 
-            </div>
+        </div>
     </main>
 
     <div id="tool-modal" class="modal">
@@ -64,45 +73,45 @@
             </div>
         </div>
     </div>
-       <footer class="footer">
-    <div class="footer-content">
-        <p>© 2026 PDF Master | Built with ❤️ by <strong>Pavanbhagi</strong></p>
-        <div class="footer-links">
-            <a href="https://github.com/Pavanbhagi" target="_blank">GitHub Profile</a>
-            <a href="https://pavanbhagi.github.io/pdf-master/sitemap.xml">Sitemap</a>
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2026 PDF Master | Built with ❤️ by <strong>Pavanbhagi</strong></p>
+            <div class="footer-links">
+                <a href="https://github.com/Pavanbhagi" target="_blank">GitHub Profile</a>
+                <a href="https://pavanbhagi.github.io/pdf-master/sitemap.xml">Sitemap</a>
+            </div>
         </div>
-    </div>
-</footer>
+    </footer>
 
-     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-    
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
     <script>
         const { PDFDocument } = PDFLib;
-        let currentMode = ""; 
+        let currentMode = "";
 
         // 1. OPEN TOOL LOGIC
         function openTool(toolType) {
-            currentMode = toolType; 
+            currentMode = toolType;
             const modal = document.getElementById('tool-modal');
             const title = document.getElementById('modal-title');
             const fileInput = document.getElementById('fileInput');
             const dropZone = document.getElementById('drop-zone');
-            
+
             modal.style.display = "block";
-            
+
             // Reset dropzone style for new tool
             dropZone.style.borderColor = "#dadce0";
             dropZone.style.background = "#f8f9fa";
 
-            if(toolType === 'img-to-pdf') {
+            if (toolType === 'img-to-pdf') {
                 title.innerText = "Convert JPG to PDF";
                 fileInput.multiple = true;
                 fileInput.accept = "image/*";
-            } else if(toolType === 'merge') {
+            } else if (toolType === 'merge') {
                 title.innerText = "Merge PDF Files";
                 fileInput.multiple = true;
                 fileInput.accept = ".pdf";
-            } else if(toolType === 'word-to-pdf') {
+            } else if (toolType === 'word-to-pdf') {
                 title.innerText = "Convert Word to PDF";
                 fileInput.multiple = false;
                 fileInput.accept = ".doc,.docx";
@@ -112,7 +121,7 @@
         // 2. CLOSE TOOL LOGIC (Fixed to actually hide the modal)
         function closeTool() {
             document.getElementById('tool-modal').style.display = "none";
-            document.getElementById('fileInput').value = ""; 
+            document.getElementById('fileInput').value = "";
             document.getElementById('modal-title').innerText = "Select Files";
         }
 
@@ -123,7 +132,7 @@
 
             const title = document.getElementById('modal-title');
             const dropZone = document.getElementById('drop-zone');
-            
+
             title.innerText = "⏳ Processing...";
             dropZone.style.borderColor = "#4285F4";
             dropZone.style.background = "#e8f0fe";
@@ -136,7 +145,7 @@
                 } else if (currentMode === 'word-to-pdf') {
                     alert("Word to PDF requires a backend server. Stay tuned!");
                 }
-                
+
                 closeTool(); // Instant cleanup
             } catch (err) {
                 console.error("Conversion Error:", err);
@@ -189,12 +198,12 @@
         }
 
         // 5. GLOBAL EVENTS
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             const modal = document.getElementById('tool-modal');
             if (event.target == modal) { closeTool(); }
         }
 
-        window.onbeforeunload = function() {
+        window.onbeforeunload = function () {
             if (document.getElementById('tool-modal').style.display === "block") {
                 return "Process in progress. Exit?";
             }
@@ -207,7 +216,28 @@
                     .then(reg => console.log('PWA Ready'))
                     .catch(err => console.log('PWA Failed', err));
             });
-        } 
+        }
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const body = document.body;
+
+        // Check for saved preference
+        if (localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark-mode');
+            darkModeToggle.innerText = "☀️";
+        }
+
+        darkModeToggle.onclick = () => {
+            body.classList.toggle('dark-mode');
+
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                darkModeToggle.innerText = "☀️";
+            } else {
+                localStorage.setItem('theme', 'light');
+                darkModeToggle.innerText = "🌙";
+            }
+        };
     </script>
 </body>
+
 </html>
