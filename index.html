@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Master - All-in-One PDF Tools</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="./manifest.json">
+   <meta name="theme-color" content="#4285F4">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">PDF<span>MASTER</span></div>
+        <ul class="nav-links">
+            <li><a href="#">Merge</a></li>
+            <li><a href="#">Compress</a></li>
+            <li><a href="#">Convert</a></li>
+            <li class="btn-login">Login</li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <h1>Every tool you need to work with PDFs in one place</h1>
+        <p>Every tool you need to use PDFs, at your fingertips. All are 100% FREE and easy to use!</p>
+    </header>
+    <div class="safety-badge" style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; color: #1e8e3e; font-weight: 500;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+    Everything stays on your device. No files are uploaded to our servers.
+</div>
+
+    <main class="container">
+        <div class="tools-grid">
+            <div class="tool-card" onclick="openTool('merge')">
+                <div class="icon blue">📚</div>
+                <h3>Merge PDF</h3>
+                <p>Combine PDFs in the order you want with the easiest PDF merger available.</p>
+            </div>
+
+            <div class="tool-card" onclick="openTool('img-to-pdf')">
+                <div class="icon red">🖼️</div>
+                <h3>JPG to PDF</h3>
+                <p>Convert JPG, PNG, BMP, GIF and TIFF images to PDF in seconds.</p>
+            </div>
+
+            <div class="tool-card" onclick="openTool('word-to-pdf')">
+                <div class="icon light-blue">📝</div>
+                <h3>Word to PDF</h3>
+                <p>Make DOC and DOCX files easy to read by converting them to PDF.</p>
+            </div>
+
+            </div>
+    </main>
+
+    <div id="tool-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeTool()">&times;</span>
+            <h2 id="modal-title">Tool Name</h2>
+            <div class="drop-zone" id="drop-zone">
+                <p>Drop your files here or click to upload</p>
+                <input type="file" id="fileInput" hidden>
+                <button class="btn-main" onclick="document.getElementById('fileInput').click()">Select Files</button>
+            </div>
+        </div>
+    </div>
+ 
+
+     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    
+    <script>
+        const { PDFDocument } = PDFLib;
+        let currentMode = ""; 
+
+        // 1. OPEN TOOL LOGIC
+        function openTool(toolType) {
+            currentMode = toolType; 
+            const modal = document.getElementById('tool-modal');
+            const title = document.getElementById('modal-title');
+            const fileInput = document.getElementById('fileInput');
+            const dropZone = document.getElementById('drop-zone');
+            
+            modal.style.display = "block";
+            
+            // Reset dropzone style for new tool
+            dropZone.style.borderColor = "#dadce0";
+            dropZone.style.background = "#f8f9fa";
+
+            if(toolType === 'img-to-pdf') {
+                title.innerText = "Convert JPG to PDF";
+                fileInput.multiple = true;
+                fileInput.accept = "image/*";
+            } else if(toolType === 'merge') {
+                title.innerText = "Merge PDF Files";
+                fileInput.multiple = true;
+                fileInput.accept = ".pdf";
+            } else if(toolType === 'word-to-pdf') {
+                title.innerText = "Convert Word to PDF";
+                fileInput.multiple = false;
+                fileInput.accept = ".doc,.docx";
+            }
+        }
+
+        // 2. CLOSE TOOL LOGIC (Fixed to actually hide the modal)
+        function closeTool() {
+            document.getElementById('tool-modal').style.display = "none";
+            document.getElementById('fileInput').value = ""; 
+            document.getElementById('modal-title').innerText = "Select Files";
+        }
+
+        // 3. THE ENGINE
+        document.getElementById('fileInput').onchange = async (e) => {
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+
+            const title = document.getElementById('modal-title');
+            const dropZone = document.getElementById('drop-zone');
+            
+            title.innerText = "⏳ Processing...";
+            dropZone.style.borderColor = "#4285F4";
+            dropZone.style.background = "#e8f0fe";
+
+            try {
+                if (currentMode === 'img-to-pdf') {
+                    await handleImageToPdf(files);
+                } else if (currentMode === 'merge') {
+                    await handleMergePdfs(files);
+                } else if (currentMode === 'word-to-pdf') {
+                    alert("Word to PDF requires a backend server. Stay tuned!");
+                }
+                
+                closeTool(); // Instant cleanup
+            } catch (err) {
+                console.error("Conversion Error:", err);
+                alert("Something went wrong. Please try again.");
+                closeTool();
+            }
+        };
+
+        // 4. PDF GENERATION LOGIC
+        async function handleImageToPdf(files) {
+            const pdfDoc = await PDFDocument.create();
+            for (const file of files) {
+                const arrayBuffer = await file.arrayBuffer();
+                let image;
+                if (file.type === "image/png") image = await pdfDoc.embedPng(arrayBuffer);
+                else image = await pdfDoc.embedJpg(arrayBuffer);
+
+                const page = pdfDoc.addPage([image.width, image.height]);
+                page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
+            }
+            const pdfBytes = await pdfDoc.save();
+            downloadFile(pdfBytes, "converted_images.pdf");
+        }
+
+        async function handleMergePdfs(files) {
+            const mergedPdf = await PDFDocument.create();
+            for (const file of files) {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await PDFDocument.load(arrayBuffer);
+                const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                copiedPages.forEach((page) => mergedPdf.addPage(page));
+            }
+            const pdfBytes = await mergedPdf.save();
+            downloadFile(pdfBytes, "merged_document.pdf");
+        }
+
+        function downloadFile(bytes, filename) {
+            const blob = new Blob([bytes], { type: "application/pdf" });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+            addToHistory(filename);
+        }
+
+        function addToHistory(name) {
+            let history = JSON.parse(sessionStorage.getItem('pdfHistory') || '[]');
+            history.push({ name: name, time: new Date().toLocaleTimeString() });
+            sessionStorage.setItem('pdfHistory', JSON.stringify(history));
+        }
+
+        // 5. GLOBAL EVENTS
+        window.onclick = function(event) {
+            const modal = document.getElementById('tool-modal');
+            if (event.target == modal) { closeTool(); }
+        }
+
+        window.onbeforeunload = function() {
+            if (document.getElementById('tool-modal').style.display === "block") {
+                return "Process in progress. Exit?";
+            }
+        };
+
+        // 6. PWA SERVICE WORKER
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('PWA Ready'))
+                    .catch(err => console.log('PWA Failed', err));
+            });
+        } 
+    </script>
+</body>
+</html>
