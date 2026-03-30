@@ -1,9 +1,12 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Master - All-in-One PDF Tools</title>
+    <title>IndiEagle PDF Master - All-in-One PDF Tools</title>
 
     <meta name="google-site-verification" content="2uwQBTxSkF56QTB9iJokLnwUBWOkmBjDXb-QpAMe6BY" />
+    
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#4285F4">
@@ -11,30 +14,24 @@
 </head>
 
 <body>
-
     <nav class="navbar">
         <div class="logo">PDF<span>MASTER</span></div>
         <ul class="nav-links">
-            <li><a href="#">Merge</a></li>
-            <li><a href="#">Compress</a></li>
-            <li><a href="#">Convert</a></li>
-            <li class="btn-login">Login</li>
-            <li><a href="#">Merge</a></li>
-            <li><a href="#">Convert</a></li>
-            <li id="dark-mode-toggle" style="cursor: pointer; font-size: 20px; list-style: none;">🌙</li>
+            <li><a href="#" onclick="openTool('merge')">Merge</a></li>
+            <li><a href="#" onclick="openTool('img-to-pdf')">Convert</a></li>
+            <li id="dark-mode-toggle" style="cursor: pointer; font-size: 20px; list-style: none; display: flex; align-items: center;">🌙</li>
             <li class="btn-login">Login</li>
         </ul>
     </nav>
 
     <header class="hero">
         <h1>Every tool you need to work with PDFs in one place</h1>
-        <p>Every tool you need to use PDFs, at your fingertips. All are 100% FREE and easy to use!</p>
+        <p>100% FREE, easy to use, and privacy-focused.</p>
     </header>
-    <div class="safety-badge"
-        style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; color: #1e8e3e; font-weight: 500;">
+
+    <div class="safety-badge" style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; color: #1e8e3e; font-weight: 500;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path
-                d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
+            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
         </svg>
         Everything stays on your device. No files are uploaded to our servers.
     </div>
@@ -58,7 +55,6 @@
                 <h3>Word to PDF</h3>
                 <p>Make DOC and DOCX files easy to read by converting them to PDF.</p>
             </div>
-
         </div>
     </main>
 
@@ -73,6 +69,7 @@
             </div>
         </div>
     </div>
+
     <footer class="footer">
         <div class="footer-content">
             <p>© 2026 PDF Master | Built with ❤️ by <strong>Pavanbhagi</strong></p>
@@ -84,12 +81,26 @@
     </footer>
 
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-
     <script>
         const { PDFDocument } = PDFLib;
         let currentMode = "";
+        const body = document.body;
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
 
-        // 1. OPEN TOOL LOGIC
+        // --- 1. DARK MODE LOGIC ---
+        if (localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark-mode');
+            darkModeToggle.innerText = "☀️";
+        }
+
+        darkModeToggle.onclick = () => {
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            darkModeToggle.innerText = isDark ? "☀️" : "🌙";
+        };
+
+        // --- 2. TOOL MODAL LOGIC ---
         function openTool(toolType) {
             currentMode = toolType;
             const modal = document.getElementById('tool-modal');
@@ -98,10 +109,8 @@
             const dropZone = document.getElementById('drop-zone');
 
             modal.style.display = "block";
-
-            // Reset dropzone style for new tool
             dropZone.style.borderColor = "#dadce0";
-            dropZone.style.background = "#f8f9fa";
+            dropZone.style.background = "transparent";
 
             if (toolType === 'img-to-pdf') {
                 title.innerText = "Convert JPG to PDF";
@@ -118,14 +127,13 @@
             }
         }
 
-        // 2. CLOSE TOOL LOGIC (Fixed to actually hide the modal)
         function closeTool() {
             document.getElementById('tool-modal').style.display = "none";
             document.getElementById('fileInput').value = "";
             document.getElementById('modal-title').innerText = "Select Files";
         }
 
-        // 3. THE ENGINE
+        // --- 3. PROCESSING ENGINE ---
         document.getElementById('fileInput').onchange = async (e) => {
             const files = Array.from(e.target.files);
             if (files.length === 0) return;
@@ -135,34 +143,25 @@
 
             title.innerText = "⏳ Processing...";
             dropZone.style.borderColor = "#4285F4";
-            dropZone.style.background = "#e8f0fe";
 
             try {
-                if (currentMode === 'img-to-pdf') {
-                    await handleImageToPdf(files);
-                } else if (currentMode === 'merge') {
-                    await handleMergePdfs(files);
-                } else if (currentMode === 'word-to-pdf') {
-                    alert("Word to PDF requires a backend server. Stay tuned!");
-                }
+                if (currentMode === 'img-to-pdf') await handleImageToPdf(files);
+                else if (currentMode === 'merge') await handleMergePdfs(files);
+                else if (currentMode === 'word-to-pdf') alert("Word to PDF coming soon!");
 
-                closeTool(); // Instant cleanup
+                closeTool();
             } catch (err) {
-                console.error("Conversion Error:", err);
-                alert("Something went wrong. Please try again.");
+                console.error(err);
+                alert("An error occurred. Please try again.");
                 closeTool();
             }
         };
 
-        // 4. PDF GENERATION LOGIC
         async function handleImageToPdf(files) {
             const pdfDoc = await PDFDocument.create();
             for (const file of files) {
                 const arrayBuffer = await file.arrayBuffer();
-                let image;
-                if (file.type === "image/png") image = await pdfDoc.embedPng(arrayBuffer);
-                else image = await pdfDoc.embedJpg(arrayBuffer);
-
+                let image = file.type === "image/png" ? await pdfDoc.embedPng(arrayBuffer) : await pdfDoc.embedJpg(arrayBuffer);
                 const page = pdfDoc.addPage([image.width, image.height]);
                 page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
             }
@@ -188,56 +187,129 @@
             link.href = URL.createObjectURL(blob);
             link.download = filename;
             link.click();
-            addToHistory(filename);
         }
 
-        function addToHistory(name) {
-            let history = JSON.parse(sessionStorage.getItem('pdfHistory') || '[]');
-            history.push({ name: name, time: new Date().toLocaleTimeString() });
-            sessionStorage.setItem('pdfHistory', JSON.stringify(history));
-        }
+        // --- 4. GLOBAL EVENTS ---
+        window.onclick = (e) => { if (e.target == document.getElementById('tool-modal')) closeTool(); }
 
-        // 5. GLOBAL EVENTS
-        window.onclick = function (event) {
-            const modal = document.getElementById('tool-modal');
-            if (event.target == modal) { closeTool(); }
-        }
-
-        window.onbeforeunload = function () {
-            if (document.getElementById('tool-modal').style.display === "block") {
-                return "Process in progress. Exit?";
-            }
-        };
-
-        // 6. PWA SERVICE WORKER
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('PWA Ready'))
-                    .catch(err => console.log('PWA Failed', err));
+                navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Failed', err));
             });
         }
-        const darkModeToggle = document.getElementById('dark-mode-toggle');
-        const body = document.body;
-
-        // Check for saved preference
-        if (localStorage.getItem('theme') === 'dark') {
-            body.classList.add('dark-mode');
-            darkModeToggle.innerText = "☀️";
-        }
-
-        darkModeToggle.onclick = () => {
-            body.classList.toggle('dark-mode');
-
-            if (body.classList.contains('dark-mode')) {
-                localStorage.setItem('theme', 'dark');
-                darkModeToggle.innerText = "☀️";
-            } else {
-                localStorage.setItem('theme', 'light');
-                darkModeToggle.innerText = "🌙";
-            }
-        };
     </script>
 </body>
+</html> -->
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INS Vikrant (R11) | Official Indigenous Carrier Portal</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-navy-black text-white font-inter">
+
+    <nav class="navbar fixed-top">
+        <div class="container flex-between">
+            <div class="logo font-orbitron">
+                <span class="flag-stripe"></span>
+                INS <span>VIKRANT</span> <small>R11</small>
+            </div>
+            <ul class="nav-links font-orbitron">
+                <li><a href="#about">The Ship</a></li>
+                <li><a href="#specs">Specifications</a></li>
+                <li><a href="#wing">Air Wing</a></li>
+                <li class="btn-primary">Atmanirbhar Bharat</li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="hero" id="about">
+        <div class="overlay-grid"></div>
+        <div class="container text-center">
+            <h2 class="subtitle font-orbitron tracking-widest text-blue">PROJECT 71 // IAC-1</h2>
+            <h1 class="main-title font-orbitron">THE RADIANT <span class="text-gradient">SOVEREIGN</span></h1>
+            <p class="motto italic">"जयेम सं युधिस्पृधः" — I defeat those who dare to challenge me.</p>
+            <div class="cta-group">
+                <button class="btn-main" onclick="location.href='#specs'">Explore Deck</button>
+                <button class="btn-outline">Watch Sea Trials</button>
+            </div>
+        </div>
+    </header>
+
+    <section class="container py-10" id="specs">
+        <div class="section-header">
+            <h3 class="font-orbitron underline-gold">Technical Parameters</h3>
+            <span class="status-tag">System Status: Active</span>
+        </div>
+        
+        <div class="specs-grid">
+            <div class="spec-card">
+                <span class="label">Displacement</span>
+                <span class="value">45,000 <small>Tonnes</small></span>
+            </div>
+            <div class="spec-card">
+                <span class="label">Max Speed</span>
+                <span class="value">30 <small>Knots</small></span>
+            </div>
+            <div class="spec-card">
+                <span class="label">Propulsion</span>
+                <span class="value">100 <small>MW</small></span>
+                <p class="sub-label">4x GE Gas Turbines</p>
+            </div>
+            <div class="spec-card">
+                <span class="label">Indigenous</span>
+                <span class="value">76 <small>%</small></span>
+            </div>
+        </div>
+    </section>
+
+    <section class="container py-10" id="wing">
+        <h3 class="font-orbitron mb-5">Carrier Air Group</h3>
+        <div class="tools-grid">
+            <div class="tool-card border-blue">
+                <div class="icon">✈️</div>
+                <h3>MiG-29K</h3>
+                <p>Primary multirole fighter. 12 units active for offensive operations.</p>
+                <div class="tags">
+                    <span class="tag">Operational</span>
+                </div>
+            </div>
+
+            <div class="tool-card border-gold">
+                <div class="icon">🚀</div>
+                <h3>Rafale M</h3>
+                <p>Omnirole capability. 26 units scheduled for full fleet integration.</p>
+                <div class="tags">
+                    <span class="tag">Acquisition</span>
+                </div>
+            </div>
+
+            <div class="tool-card">
+                <div class="icon">🚁</div>
+                <h3>MH-60R Romeo</h3>
+                <p>Advanced Anti-Submarine (ASW) and search & rescue (SAR) helicopter.</p>
+                <div class="tags">
+                    <span class="tag">Tactical</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2026 INS Vikrant Digital Portal | Built by <strong>Pavanbhagi</strong></p>
+            <div class="navy-crest-placeholder">⚓ INDIAN NAVY // ATMANIRBHAR BHARAT</div>
+            <div class="footer-links">
+                <a href="https://github.com/Pavanbhagi" target="_blank">View Source</a>
+                <a href="#">Maritime History</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
 </html>
